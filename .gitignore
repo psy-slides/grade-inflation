@@ -19,7 +19,6 @@ rsconnect/
 
 # Output temporanei
 *.html
-manifest.json
 Rplots.pdf
 .DS_Store
 Thumbs.db
