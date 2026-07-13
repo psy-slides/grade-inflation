@@ -1,0 +1,25 @@
+# R
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.user/
+.Rproj.user
+
+# renv (la libreria locale non si committa; il lockfile sì)
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
+
+# Deploy (credenziali e stato locale di rsconnect)
+rsconnect/
+
+# Output temporanei
+*.html
+manifest.json
+Rplots.pdf
+.DS_Store
+Thumbs.db

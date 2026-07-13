@@ -1,0 +1,28 @@
+Type: Project
+Package: grade.percentili
+Title: Laboratorio simulativo su voti universitari e percentili
+Version: 0.1.0
+Description: App Shiny interamente basata su dati simulati per esplorare il
+    valore informativo dei voti universitari (18-30) e indicatori individuali
+    basati sui percentili degli esami. Nessun dato reale.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends:
+    R (>= 4.3)
+Imports:
+    shiny,
+    bslib,
+    ggplot2,
+    dplyr,
+    tidyr,
+    purrr,
+    tibble,
+    scales,
+    yaml,
+    jsonlite,
+    DT,
+    htmltools
+Suggests:
+    testthat,
+    rsconnect,
+    renv

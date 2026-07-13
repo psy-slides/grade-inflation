@@ -1,0 +1,154 @@
+# Configurazione centralizzata dell'app.
+# Tutti i valori numerici "sensibili" (default, fasce di affidabilita', soglie delle spie,
+# limiti di validazione) vivono qui: il codice R non deve contenere numeri magici.
+
+defaults:
+  n_courses: 3                 # numero di corsi di studio (2-5)
+  n_mandatory: 4               # esami obbligatori per CdS
+  n_optional_groups: 1         # gruppi di esami alternativi per CdS
+  n_alternatives_per_group: 2  # alternative dentro ogni gruppo
+  n_students_per_course: 200   # N per CdS (globale; modalita' avanzata: vettore per CdS)
+  students_per_course_custom: ""  # es. "200,150,300"; vuoto = usa il valore globale
+  target_mean_grade: 27.5      # voto medio osservato complessivo desiderato
+  exam_heterogeneity: 2.0      # tau_exam: sd dei delta_j sulla scala latente (punti di voto)
+  reliability_level: "media"   # bassa | media | alta  (default OBBLIGATORIO: media)
+  choice_mode: "casuale"       # casuale | strategica
+  strategic_strength: 0.0      # peso del voto atteso standardizzato nell'utilita' di scelta
+  hard_exam_preference: 0.0    # peso di theta_i * difficolta'_j nell'utilita' di scelta
+  softmax_temperature: 1.0     # temperatura della softmax (piu' alta = scelta piu' casuale)
+  percentile_method: "rango_medio"  # rango_medio | conservativo
+  max_attempts: 1000           # tetto tecnico ai tentativi per il primo voto verbalizzato
+  seed: 20260712
+
+# Affidabilita' latente target: reliability = lambda^2 / (lambda^2 + sigma_eps^2).
+# Con lambda = 1: sigma_eps = sqrt((1 - rel) / rel).
+reliability_levels:
+  bassa: 0.35
+  media: 0.60
+  alta: 0.80
+
+model:
+  lambda: 1.0        # discriminazione comune a TUTTI gli esami (semplificazione dichiarata)
+  grade_min: 18      # sotto questa soglia il tentativo non viene verbalizzato
+  grade_max: 30      # soffitto: valori latenti superiori diventano 30
+
+calibration:
+  tolerance: 0.10        # tolleranza sul voto medio osservato (punti); documentata in METHODS.md
+  n_theta_grid: 101      # nodi della griglia di quantili di N(0,1) per la media attesa
+  base_location_min: 10  # intervallo di ricerca per base_location
+  base_location_max: 60
+
+# Spia di stabilita' del riferimento percentile (basata sull'N effettivo dell'esame).
+stability_thresholds:
+  fragile_below: 40   # N < 40  -> fragile
+  good_at_least: 100  # N >= 100 -> buona; in mezzo -> moderata
+
+# Spia di risoluzione della distribuzione osservata (capacita' discriminativa).
+resolution_thresholds:
+  distinct_poor_max: 4     # <= 4 valori distinti -> scarsa
+  distinct_medium_max: 7   # <= 7 valori distinti -> media
+  modal_share_poor: 0.50   # quota del valore modale >= 50% -> scarsa
+  modal_share_medium: 0.35 # quota del valore modale >= 35% -> almeno media
+  top_share_poor: 0.50     # quota di 30 >= 50% -> scarsa
+
+# Limiti di validazione degli input (min, max).
+limits:
+  n_courses: [2, 5]
+  n_mandatory: [1, 8]
+  n_optional_groups: [0, 2]
+  n_alternatives_per_group: [2, 4]
+  n_exams_per_course: [2, 12]      # vincolo tecnico sul totale derivato
+  n_students_per_course: [20, 1000]
+  n_students_total: [40, 5000]
+  target_mean_grade: [21, 29.5]
+  exam_heterogeneity: [0, 4]
+  strategic_strength: [0, 3]
+  hard_exam_preference: [0, 3]
+  softmax_temperature: [0.1, 5]
+  max_attempts: [10, 100000]
+
+# Fasce di theta per il campionamento di profili illustrativi (terzili teorici di N(0,1)).
+theta_profiles:
+  low_below: -0.4307273    # qnorm(1/3)
+  high_at_least: 0.4307273 # qnorm(2/3)
+
+# Nomi chiaramente fittizi (nessun riferimento a insegnamenti reali identificabili).
+course_name_pool:
+  - "Scienze psicologiche"
+  - "Psicologia applicata"
+  - "Psicologia e sviluppo"
+  - "Psicologia dei contesti"
+  - "Studi psicologici integrati"
+
+exam_name_pool:
+  - "Psicometria"
+  - "Processi cognitivi"
+  - "Psicologia sociale"
+  - "Psicologia dello sviluppo"
+  - "Psicologia clinica"
+  - "Psicologia generale"
+  - "Psicologia dinamica"
+  - "Psicologia del lavoro"
+  - "Neuropsicologia"
+  - "Test psicologici"
+  - "Psicologia della personalita'"
+  - "Psicologia dell'educazione"
+
+optional_name_suffixes: ["A", "B", "C", "D"]
+
+# Preset di scenario: compilano i controlli; la simulazione parte comunque
+# solo con il pulsante "Simula scenario".
+presets:
+  "Scenario informativo":
+    target_mean_grade: 25.5
+    exam_heterogeneity: 0.8
+    reliability_level: "alta"
+    choice_mode: "casuale"
+    strategic_strength: 0
+    hard_exam_preference: 0
+  "Medie molto diverse tra esami":
+    target_mean_grade: 27.0
+    exam_heterogeneity: 3.0
+    reliability_level: "media"
+    choice_mode: "casuale"
+    strategic_strength: 0
+    hard_exam_preference: 0
+  "Grade inflation moderata":
+    target_mean_grade: 28.3
+    exam_heterogeneity: 1.5
+    reliability_level: "media"
+    choice_mode: "casuale"
+    strategic_strength: 0
+    hard_exam_preference: 0
+  "Forte effetto soffitto":
+    target_mean_grade: 29.0
+    exam_heterogeneity: 1.2
+    reliability_level: "media"
+    choice_mode: "casuale"
+    strategic_strength: 0
+    hard_exam_preference: 0
+  "Quasi tutti al massimo":
+    target_mean_grade: 29.5
+    exam_heterogeneity: 0.8
+    reliability_level: "alta"
+    choice_mode: "casuale"
+    strategic_strength: 0
+    hard_exam_preference: 0
+  "Scelta strategica degli opzionali":
+    target_mean_grade: 27.5
+    exam_heterogeneity: 2.0
+    reliability_level: "media"
+    choice_mode: "strategica"
+    strategic_strength: 1.5
+    hard_exam_preference: 0
+  "Studenti migliori verso esami difficili":
+    target_mean_grade: 27.5
+    exam_heterogeneity: 2.0
+    reliability_level: "media"
+    choice_mode: "strategica"
+    strategic_strength: 0
+    hard_exam_preference: 1.5
+
+disclaimer: >
+  Tutti i dati mostrati sono simulati. L'app non usa dati reali, non riproduce corsi di
+  studio esistenti e non costituisce uno strumento validato o implementabile cosi' com'e'.
